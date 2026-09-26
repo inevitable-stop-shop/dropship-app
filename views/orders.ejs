@@ -1,0 +1,58 @@
+<div class="page-header">
+  <h1>Fulfillment</h1>
+  <button class="btn primary" onclick="document.getElementById('test-order').style.display='block'">Manual Test</button>
+</div>
+
+<% if (locals.error) { %><div class="alert error"><%= error %></div><% } %>
+<% if (locals.ok) { %><div class="alert success"><%= ok %></div><% } %>
+
+<!-- Manual test: trigger fulfillment for a specific Shopify order ID -->
+<div id="test-order" class="card" style="display:none">
+  <h3>Manual Fulfillment Test</h3>
+  <p class="muted">Enter a Shopify order ID (number only) to manually trigger supplier emails. Useful for testing or re-processing.</p>
+  <form method="POST" action="/orders/test" class="inline-form">
+    <input type="number" name="shopify_order_id" placeholder="Shopify Order ID (e.g. 1234567890)" required>
+    <button type="submit" class="btn primary">Send Emails</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Fulfillment Log</h3>
+  <% if (logs.length === 0) { %>
+    <p class="muted">No fulfillment emails sent yet. Emails are sent automatically when a customer places an order
+    on your Shopify store (via webhook) or manually via the test button above.</p>
+  <% } else { %>
+    <table>
+      <thead>
+        <tr><th>Order</th><th>Supplier</th><th>Emailed To</th><th>Status</th><th>Tracking</th><th>Carrier</th><th>Date</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <% logs.forEach(log => { %>
+        <tr>
+          <td><strong><%= log.order_number %></strong></td>
+          <td><%= log.supplier_name %></td>
+          <td><%= log.email_to %></td>
+          <td><span class="pill <%= log.status %>"><%= log.status %></span></td>
+          <td><%= log.tracking_number || '—' %></td>
+          <td><%= log.tracking_carrier || '—' %></td>
+          <td class="muted"><%= log.created_at %></td>
+          <td>
+            <% if (!log.tracking_number) { %>
+              <button class="btn small" onclick="document.getElementById('tracking-<%= log.id %>').style.display='block'">Add Tracking</button>
+              <div id="tracking-<%= log.id %>" class="inline-popup" style="display:none">
+                <form method="POST" action="/orders/<%= log.id %>/tracking" class="inline-form">
+                  <input type="text" name="tracking_number" placeholder="Tracking #" required>
+                  <input type="text" name="tracking_carrier" placeholder="Carrier (UPS, FedEx, USPS...)">
+                  <button type="submit" class="btn primary small">Sync to Shopify</button>
+                </form>
+              </div>
+            <% } else { %>
+              <span class="check">✓</span>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

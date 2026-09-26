@@ -1,0 +1,45 @@
+<div class="page-header">
+  <h1>Suppliers</h1>
+  <button class="btn primary" onclick="document.getElementById('add-supplier').style.display='block'">+ Add Supplier</button>
+</div>
+
+<div id="add-supplier" class="card" style="display:none">
+  <h3>New Supplier</h3>
+  <form method="POST" action="/suppliers">
+    <div class="form-grid">
+      <label>Name<input type="text" name="name" required></label>
+      <label>Email<input type="email" name="email" required></label>
+      <label>Phone<input type="text" name="phone"></label>
+      <label>Default Lead Days<input type="number" name="default_lead_days" value="3"></label>
+    </div>
+    <label class="full">Notes (shipping instructions, etc.)<textarea name="notes" rows="2"></textarea></label>
+    <button type="submit" class="btn primary">Save Supplier</button>
+  </form>
+</div>
+
+<div class="card">
+  <% if (suppliers.length === 0) { %>
+    <p class="muted">No suppliers yet. Add your first supplier above.</p>
+  <% } else { %>
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Lead Days</th><th>Products</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% suppliers.forEach(s => { %>
+        <tr>
+          <td><strong><%= s.name %></strong></td>
+          <td><%= s.email %></td>
+          <td><%= s.phone || '—' %></td>
+          <td><%= s.default_lead_days %> days</td>
+          <td><%= s.product_count %></td>
+          <td>
+            <form method="POST" action="/suppliers/<%= s.id %>/delete" style="display:inline"
+                  onsubmit="return confirm('Delete supplier <%= s.name %>? Products linked to this supplier remain but lose their supplier reference.')">
+              <button class="btn danger small">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

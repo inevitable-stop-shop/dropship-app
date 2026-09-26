@@ -1,0 +1,78 @@
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <span class="timestamp"><%= new Date().toLocaleString() %></span>
+</div>
+
+<!-- Shopify connection status -->
+<div class="card">
+  <h3>Shopify Connection</h3>
+  <% if (shopConnected && shopConnected.name) { %>
+    <div class="status-ok">
+      <span class="dot green"></span>
+      Connected to <strong><%= shopConnected.name %></strong> (<%= shopConnected.domain %>)
+      <span class="badge"><%= shopConnected.plan %></span>
+    </div>
+  <% } else if (shopConnected && shopConnected.error) { %>
+    <div class="status-bad">
+      <span class="dot red"></span>
+      Not connected: <%= shopConnected.error %>
+    </div>
+    <p class="muted">Set SHOPIFY_SHOP_DOMAIN and SHOPIFY_ADMIN_TOKEN in .env, then restart.</p>
+  <% } else { %>
+    <div class="status-warn">
+      <span class="dot yellow"></span>
+      Not configured — go to Settings
+    </div>
+  <% } %>
+</div>
+
+<!-- Stats grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.suppliers %></div>
+    <div class="stat-label">Suppliers</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.products %></div>
+    <div class="stat-label">Products</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.activeProducts %></div>
+    <div class="stat-label">Active Products</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.fulfillmentLogs %></div>
+    <div class="stat-label">Fulfillment Emails Sent</div>
+  </div>
+  <div class="stat-card highlight">
+    <div class="stat-value"><%= stats.pendingTracking %></div>
+    <div class="stat-label">Awaiting Tracking</div>
+  </div>
+</div>
+
+<!-- Recent fulfillment activity -->
+<div class="card">
+  <h3>Recent Fulfillment Activity</h3>
+  <% if (recentLogs.length === 0) { %>
+    <p class="muted">No fulfillment emails sent yet. When a customer places an order on your Shopify store,
+    the app will automatically email each supplier their portion of the order.</p>
+  <% } else { %>
+    <table>
+      <thead>
+        <tr><th>Order</th><th>Supplier</th><th>Emailed To</th><th>Status</th><th>Tracking</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        <% recentLogs.forEach(log => { %>
+        <tr>
+          <td><%= log.order_number %></td>
+          <td><%= log.supplier_name %></td>
+          <td><%= log.email_to %></td>
+          <td><span class="pill <%= log.status %>"><%= log.status %></span></td>
+          <td><%= log.tracking_number || '—' %></td>
+          <td class="muted"><%= log.created_at %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

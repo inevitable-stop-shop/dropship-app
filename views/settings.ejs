@@ -1,0 +1,71 @@
+<div class="page-header">
+  <h1>Settings</h1>
+</div>
+
+<% if (locals.error) { %><div class="alert error"><%= error %></div><% } %>
+<% if (locals.ok) { %><div class="alert success"><%= ok %></div><% } %>
+
+<!-- Webhooks -->
+<div class="card">
+  <h3>Shopify Webhooks</h3>
+  <p class="muted">
+    The app listens for <code>orders/create</code> webhooks. When a customer buys, Shopify sends the order here,
+    and the app emails each supplier their portion automatically.
+  </p>
+  <p>Webhook endpoint: <code><%= appBaseUrl || '(not set)' %>/webhooks/orders/create</code></p>
+
+  <% if (webhookError) { %>
+    <div class="alert error">Cannot connect to Shopify: <%= webhookError %></div>
+  <% } else if (webhooks.length === 0) { %>
+    <p class="muted">No webhooks registered yet.</p>
+  <% } else { %>
+    <table>
+      <thead><tr><th>Topic</th><th>Address</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% webhooks.forEach(w => { %>
+        <tr>
+          <td><strong><%= w.topic %></strong></td>
+          <td><code><%= w.address %></code></td>
+          <td>
+            <form method="POST" action="/settings/webhooks/<%= w.id %>/delete" style="display:inline">
+              <button class="btn danger small">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <form method="POST" action="/settings/webhooks/register" style="margin-top:12px">
+    <button type="submit" class="btn primary">Register Order Webhook</button>
+  </form>
+</div>
+
+<!-- Email/SMTP status -->
+<div class="card">
+  <h3>Email (SMTP) Status</h3>
+  <% if (mailStatus && mailStatus.ok) { %>
+    <div class="status-ok"><span class="dot green"></span> SMTP connection verified — supplier emails will send.</div>
+  <% } else if (mailStatus) { %>
+    <div class="status-bad"><span class="dot red"></span> SMTP error: <%= mailStatus.error %></div>
+    <p class="muted">Check SMTP_* settings in your .env file.</p>
+  <% } else { %>
+    <div class="status-warn"><span class="dot yellow"></span> Not tested.</div>
+  <% } %>
+</div>
+
+<!-- Configuration reference -->
+<div class="card">
+  <h3>Configuration (.env)</h3>
+  <p class="muted">Edit <code>.env</code> and restart the app to change any of these.</p>
+  <table>
+    <thead><tr><th>Variable</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>SHOPIFY_SHOP_DOMAIN</td><td><%= shopDomain || '(not set)' %></td></tr>
+      <tr><td>APP_BASE_URL</td><td><%= appBaseUrl || '(not set)' %></td></tr>
+      <tr><td>SMTP_HOST</td><td><%= process.env.SMTP_HOST || '(not set)' %></td></tr>
+      <tr><td>SMTP_USER</td><td><%= process.env.SMTP_USER || '(not set)' %></td></tr>
+    </tbody>
+  </table>
+</div>

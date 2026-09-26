@@ -1,0 +1,21 @@
+{
+  "name": "shopify-dropship-app",
+  "version": "1.0.0",
+  "description": "Shopify custom app: import supplier products, auto-email suppliers on order, sync fulfillment tracking",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "express-session": "^1.17.3",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.3.1",
+    "nodemailer": "^6.9.7",
+    "express-ejs-layouts": "^2.5.1",
+    "pg": "^8.11.3"
+  }
+}
