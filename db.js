@@ -37,7 +37,7 @@ async function init() {
       id SERIAL PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      created_at TEXT DEFAULT (datetime('now'))
+      created_at TIMESTAMP DEFAULT NOW()
     );
 
     CREATE TABLE IF NOT EXISTS suppliers (
@@ -47,7 +47,7 @@ async function init() {
       phone TEXT,
       default_lead_days INTEGER DEFAULT 3,
       notes TEXT,
-      created_at TEXT DEFAULT (datetime('now'))
+      created_at TIMESTAMP DEFAULT NOW()
     );
 
     CREATE TABLE IF NOT EXISTS products (
@@ -64,7 +64,7 @@ async function init() {
       shopify_variant_id INTEGER,
       inventory INTEGER DEFAULT 0,
       is_active INTEGER DEFAULT 1,
-      created_at TEXT DEFAULT (datetime('now'))
+      created_at TIMESTAMP DEFAULT NOW()
     );
 
     CREATE TABLE IF NOT EXISTS fulfillment_logs (
@@ -79,7 +79,7 @@ async function init() {
       tracking_number TEXT,
       tracking_carrier TEXT,
       line_items TEXT,
-      created_at TEXT DEFAULT (datetime('now'))
+      created_at TIMESTAMP DEFAULT NOW()
     );
 
     CREATE TABLE IF NOT EXISTS settings (
