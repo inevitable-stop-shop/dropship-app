@@ -94,6 +94,12 @@ async function init() {
   if (!adminExists) {
     const hash = bcrypt.hashSync(adminPass, 10);
     await query('INSERT INTO app_users (username, password_hash) VALUES ($1, $2)', ['admin', hash]);
+  } else {
+    // Update the admin password hash if APP_ADMIN_PASSWORD has changed.
+    // Re-hashing the current env value and updating ensures changing the env
+    // var and restarting the app updates the stored password.
+    const newHash = bcrypt.hashSync(adminPass, 10);
+    await query('UPDATE app_users SET password_hash = $1 WHERE username = $2', [newHash, 'admin']);
   }
 }
 

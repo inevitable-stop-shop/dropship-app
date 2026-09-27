@@ -22,7 +22,7 @@ app.set('layout', 'layout');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-  secret: 'dropship-app-secret-change-me',
+  secret: process.env.SESSION_SECRET || 'dropship-app-fallback-secret-2026',
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 86400000 },
@@ -32,6 +32,15 @@ app.use(session({
 app.use((req, res, next) => {
   res.locals.shopDomain = process.env.SHOPIFY_SHOP_DOMAIN || '';
   res.locals.appBaseUrl = process.env.APP_BASE_URL || '';
+  next();
+});
+
+// Security headers (applied to all responses, before routes)
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   next();
 });
 
@@ -77,7 +86,8 @@ app.get('/auth/callback', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1';
+app.listen(PORT, host, () => {
   console.log(`\n  ════════════════════════════════════════════`);
   console.log(`  Shopify Dropship App running`);
   console.log(`  Admin panel:  http://localhost:${PORT}`);
