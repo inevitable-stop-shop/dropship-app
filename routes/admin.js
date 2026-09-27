@@ -222,6 +222,21 @@ router.post('/settings/webhooks/:id/delete', requireAuth, async (req, res) => {
   res.redirect('/settings');
 });
 
+// ---- Update password (temp endpoint, will be removed after use) ----
+router.post('/update-password', requireAuth, async (req, res) => {
+  try {
+    const { new_password } = req.body;
+    if (!new_password || new_password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+    const hash = bcrypt.hashSync(new_password, 10);
+    await query('UPDATE app_users SET password_hash = $1 WHERE username = $2', [hash, 'admin']);
+    res.json({ ok: true, message: 'Password updated' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ---- Manual test ----
 router.post('/orders/test', requireAuth, async (req, res) => {
   const { shopify_order_id } = req.body;
