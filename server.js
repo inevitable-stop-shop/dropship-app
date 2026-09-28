@@ -46,7 +46,6 @@ app.use((req, res, next) => {
 
 // Google Shopping feed - public route, no auth required
 const fs = require('fs');
-const path = require('path');
 app.get('/google_shopping_feed.xml', (req, res) => {
   const feedPath = path.join(__dirname, 'public', 'google_shopping_feed.xml');
   if (fs.existsSync(feedPath)) {
