@@ -44,6 +44,19 @@ app.use((req, res, next) => {
   next();
 });
 
+// Google Shopping feed - public route, no auth required
+const fs = require('fs');
+const path = require('path');
+app.get('/google_shopping_feed.xml', (req, res) => {
+  const feedPath = path.join(__dirname, 'public', 'google_shopping_feed.xml');
+  if (fs.existsSync(feedPath)) {
+    res.setHeader('Content-Type', 'application/xml');
+    res.sendFile(feedPath);
+  } else {
+    res.status(404).send('Feed not found');
+  }
+});
+
 // Routes
 const adminRoutes = require('./routes/admin');
 app.use('/', adminRoutes.router);
